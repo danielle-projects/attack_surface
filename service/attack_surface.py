@@ -22,19 +22,27 @@ class AttackSurfaceService:
         self.vms_data = self.parse_vms()
         self.fw_rules_data = self.parse_fw_rules()
         self.edges = self.prepare_data_graph()
-        self.requests_count = 0
+        self.request_count = 0
         self.cumulative_process_time = 0
         self.vms_number = len(self.vms_data)
 
     @staticmethod
     def get_service_input(input_file_path):
-        # TODO: what to do if input_file_path is not valid?
-        with open(input_file_path) as json_file:
-            service_data = json.load(json_file)
-            return service_data
+        try:
+            with open(input_file_path) as json_file:
+                service_data = json.load(json_file)
+                return service_data
+        except OSError:
+            print('cannot open', input_file_path)
+            return None
+        else:
+            print(input_file_path, 'has', len(f.readlines()), 'lines')
+            return None
 
     def parse_vms(self):
         vms = list()
+        if self.origin_service_input is None:
+            return []
         for vm in self.origin_service_input['vms']:
             vm_id = vm['vm_id']
             vm_name = vm['name']
@@ -45,6 +53,8 @@ class AttackSurfaceService:
 
     def parse_fw_rules(self):
         fw_rules = list()
+        if self.origin_service_input is None:
+            return []
         for fw_rule in self.origin_service_input['fw_rules']:
             fw_id = fw_rule['fw_id']
             source_tag = fw_rule['source_tag']
@@ -54,7 +64,7 @@ class AttackSurfaceService:
         return fw_rules
 
     def incr_req_counter(self):
-        self.requests_count += 1
+        self.request_count += 1
 
     def prepare_data_graph(self):
         tag_vm_dict = {}
