@@ -1,6 +1,5 @@
 import json
 import itertools
-from flask import Flask
 
 
 class VirtualMachine:
@@ -17,7 +16,7 @@ class FirewallRule:
         self.dest_tag = dest_tag
 
 
-class AttackSurfaceService(Flask):
+class AttackSurfaceService:
     def __init__(self, input_file_path):
         self.origin_service_input = self.get_service_input(input_file_path)
         self.vms_data = self.parse_vms()
@@ -29,6 +28,7 @@ class AttackSurfaceService(Flask):
 
     @staticmethod
     def get_service_input(input_file_path):
+        # TODO: what to do if input_file_path is not valid?
         with open(input_file_path) as json_file:
             service_data = json.load(json_file)
             return service_data
