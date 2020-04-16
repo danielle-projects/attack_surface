@@ -6,20 +6,20 @@ from flask import request
 from service.attack_surface import AttackSurfaceService
 from service.consts import ApiConsts
 
-logger = logging.getLogger('spam_application')
+logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
+logging.basicConfig(filename='app.log', filemode='w')
 
 
 def configure_routes(app, input_file_path):
     attack_surface = AttackSurfaceService(
         input_file_path=input_file_path,
     )
-    logger.info('attack surface configured properly')
 
     @app.route('/api/v1/stats', methods=['GET'])
     def stats():
+        logger.info(f'{time.time()} stats endpoint was called')
         attack_surface.incr_req_counter()
-        logger.info('stats endpoint was called')
         requests_count = attack_surface.request_count
         avg_process_time = \
             attack_surface.cumulative_process_time / requests_count \
@@ -37,6 +37,7 @@ def configure_routes(app, input_file_path):
 
     @app.route('/api/v1/attack', methods=['GET'])
     def attack():
+        logger.info(f'{time.time()} - attack endpoint was called')
         attack_surface.incr_req_counter()
         vm_id = request.args.get('vm_id')
         start_time = time.time()
