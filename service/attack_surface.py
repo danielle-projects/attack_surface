@@ -1,18 +1,19 @@
 import json
 
-from service.data_seriazable import DataSerializable
-from service.graph_utils import GraphUtils
+from service.object_deserializer import ObjectDeserializer
+from service.vms_graph import VMGraph
+from service.api_consts import APIConsts
 
 
 class AttackSurfaceService:
     def __init__(self, input_file_path):
         self.origin_service_input = self.get_service_input(input_file_path)
-        self.vms_data = DataSerializable.parse_vms(self.origin_service_input['vms'])
-        self.fw_rules_data = DataSerializable.parse_fw_rules(self.origin_service_input['fw_rules'])
-        self.vm_potentials_attackers_dict = GraphUtils().handle_graph(vms_data=self.vms_data, fw_rules_data=self.fw_rules_data)
+        vms_data = ObjectDeserializer.parse_vms(self.origin_service_input[APIConsts.VMS])
+        fw_rules_data = ObjectDeserializer.parse_fw_rules(self.origin_service_input[APIConsts.FW_RULES])
+        self.vm_potentials_attackers_dict = VMGraph(vms_data, fw_rules_data).vm_potentials_attackers_dict
         self.request_count = 0
         self.cumulative_process_time = 0
-        self.vms_number = len(self.vms_data)
+        self.vms_number = len(vms_data)
 
     @staticmethod
     def get_service_input(input_file_path):
