@@ -18,6 +18,7 @@ def configure_routes(app, input_file_path):
 
     @app.route('/api/v1/stats', methods=['GET'])
     def stats():
+        attack_surface.incr_req_counter()
         logger.info('stats endpoint was called')
         requests_count = attack_surface.request_count
         avg_process_time = \
