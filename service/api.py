@@ -18,5 +18,5 @@ if __name__ == '__main__':
                         default='data/input-0.json')
     args = parser.parse_args()
     attack_surface_app = create_attack_surface_app(args.input_file_path)
-    attack_surface_app.run(debug=True)
+    attack_surface_app.run(host='0.0.0.0', port=5000)
 

@@ -1,18 +1,23 @@
 import itertools
-
 import networkx as nx
 
 
 class VMGraph:
     def __init__(self, vms_data, fw_rules_data):
+        """
+        This class represents a graph where the nodes are VMs and the edges are
+        firewall rules between them - if VM_1 has tag 'A' and VM_2 has tag 'B' and
+        there is a FW rule from 'A' -> 'B', then there is an edge in the graph between
+        VM_1 and VM_2.
+        """
         self.vm_graph = self.create_graph(vms_data, fw_rules_data)
-        self.vm_potentials_attackers_dict = self.prepare_vm_potentials_attackers_dict(self.vm_graph)
+        self.vm_potentials_attackers_dict = self.prepare_vm_potential_attackers_dict(self.vm_graph)
 
     def prepare_graph_edges(self, vms_data, fw_rules_data):
         """
-        This method does...
-        :param vms_data: list of 'virtual_machine' objects.
-        :param fw_rules_data: list of 'fw_rule' objects.
+        Creates all the graph edges.
+        :param vms_data: list of virtual_machine objects.
+        :param fw_rules_data: list of fw_rule objects.
         :return: list of virtual machines pairs.
         """
         tag_vms_dict = self.prepare_tag_vms_dict(vms_data)
@@ -31,9 +36,10 @@ class VMGraph:
 
     def prepare_tag_vms_dict(self, vms_data):
         """
-        This method..
+        Creates a dict where every key is a tag and it's value is the
+        VMs that have that tag.
         :param vms_data: ist of 'virtual_machine' objects.
-        :return: dictionary which all its keys are tags and theirs value is a list of all vms with this tag
+        :return:
         """
         tag_vms_dict = {}
         for vm in vms_data:
@@ -46,11 +52,7 @@ class VMGraph:
 
     def create_graph(self, vms_data, fw_rules_data):
         """
-        Create the VM graph - the nodes are VM ids and the edges are FW rules connecting
-        between VMs if they have the corresponding tags.
-        :param vms_data:
-        :param fw_rules_data:
-        :return:
+        Create the VM graph as a networkx graph.
         """
         nodes = [vm.vm_id for vm in vms_data]
         edges = self.prepare_graph_edges(vms_data, fw_rules_data)
@@ -59,9 +61,10 @@ class VMGraph:
         vms_graph.add_edges_from(edges)
         return vms_graph
 
-    def prepare_vm_potentials_attackers_dict(self, vm_graph):
+    def prepare_vm_potential_attackers_dict(self, vm_graph):
         """
-
+        Creates a dict where the key is a VM id and it's value is all the VMs that
+        can reach it ('potential attackers').
         :param vm_graph:
         :return:
         """
@@ -76,7 +79,7 @@ class VMGraph:
         Executes a BFS to find all nodes that start_node can 'attack' (reach).
         :param graph: the vm graph
         :param start_node: the node to check on
-        :param vm_potentials_attackers_dict: mutable dict that maps vms and who can reach them
+        :param vm_potentials_attackers_dict: *mutable* dict that maps vms and who can reach them
         :return:
         """
         visited = []
